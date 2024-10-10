@@ -10,7 +10,6 @@ app.use(express.static('public'));
 app.use('/products', productRoutes);
 
 app.get('/', (req, res) => {
-    console.log('TEST');
     res.send('Hello from Homepage.');
 });
 

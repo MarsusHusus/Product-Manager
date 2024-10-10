@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+
+        <form id="productForm" class="mb-4">
+            <input type="text" id="name" placeholder="Product Name" class="form-control mb-2" required>
+            <input type="text" id="category" placeholder="Category" class="form-control mb-2" required>
+            <input type="number" id="price" placeholder="Price" class="form-control mb-2" required>
+            <button type="submit" class="btn btn-primary btn-block">Add Product</button>
+        </form>
+
+        <h2>Products</h2>
+        <ul id="productList" class="list-group"></ul>
+    </div>
+
+    <script>
+        const productForm = document.getElementById('productForm');
+        const productList = document.getElementById('productList');
+
+        const fetchProducts = async () => {
+            const response = await fetch('/products');
+            const products = await response.json();
+            productList.innerHTML = '';
+            products.forEach(product => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `${product.name} - ${product.category} - $${product.price} 
+                    <button onclick="deleteProduct('${product.id}')" class="btn btn-danger btn-sm">Delete</button>`;
+                productList.appendChild(li);
+            });
+        };
+
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const category = document.getElementById('category').value;
+            const price = parseFloat(document.getElementById('price').value);
+            await fetch('/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, category, price })
+            });
+            productForm.reset();
+            fetchProducts();
+        });
+
+        const deleteProduct = async (id) => {
+            await fetch(`/products/${id}`, { method: 'DELETE' });
+            fetchProducts();
+        };
+
+        fetchProducts();
+    </script>
+</body>
+</html>
